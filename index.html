@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Charming 3D Shapes Viewer</title>
+<style>
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(90deg,#fff9e4,#bce3ff 65%); 
+}
+#canvasBox { 
+  border:1px solid #aaa; 
+  margin-top:10px; 
+  background:#fff; 
+  border-radius:16px; 
+  box-shadow: 0px 10px 26px #9adeff60; 
+  cursor: grab;
+}
+h2 { color:#3888b6; }
+.controls { margin-bottom:8px; }
+.controls input, .controls select, .controls button { margin-right:8px; border-radius:8px; padding:4px 8px; }
+.controls label {margin-right:6px;}
+.tabbtn.active { background:#bce3ff; }
+.tabbtn { border:1px solid #bbb; padding:7px 22px; cursor:pointer; margin-right:4px; border-radius:10px 10px 0 0; background:#fff9e4; color:#3888b6;}
+.tabcontent { display:none; }
+.tabcontent.active { display:block; }
+.displayOpts { margin-top:8px; margin-bottom:8px; }
+#feedback { color:#d00; font-weight:bold; min-height:24px; margin:10px 0; }
+button { background:#68cdfb; color:#fff; border:none; font-weight:bold; box-shadow:0 2px 8px #61e4f790;}
+button:hover { background:#3888b6; }
+</style>
+</head>
+<body>
+<h2>Charming 3D Prisms, Pyramids & Cone Viewer</h2>
+<div>
+  <button class="tabbtn active" onclick="showTab(0)">Cube</button>
+  <button class="tabbtn" onclick="showTab(1)">Rectangular Prism</button>
+  <button class="tabbtn" onclick="showTab(2)">Triangular Prism</button>
+  <button class="tabbtn" onclick="showTab(3)">Square Pyramid</button>
+  <button class="tabbtn" onclick="showTab(4)">Tetrahedron</button>
+  <button class="tabbtn" onclick="showTab(5)">Cone</button>
+</div>
+<div id="feedback"></div>
+<div id="tabContainer">
+  <!-- Cube -->
+  <div class="tabcontent active">
+    <div class="controls">
+      <label>Edge length: <input type="number" id="cubeEdge" value="120" min="1" ></label>
+      <label>Unit: <select id="cubeUnit"><option>cm</option><option>mm</option><option>m</option></select></label>
+    </div>
+    <div class="displayOpts">
+      Show vertex labels <select id="show_cube_vertices"><option value="yes">Yes</option><option value="no">No</option></select>
+      Show space diagonals <select id="show_cube_spacediag"><option value="no">No</option><option value="yes">Yes</option></select>
+    </div>
+    <button onclick="drawShape()">Draw Cube</button>
+  </div>
+  <!-- Rectangular Prism -->
+  <div class="tabcontent">
+    <div class="controls">
+      <label>Width: <input type="number" id="rectWidth" value="120" min="1"></label>
+      <label>Height: <input type="number" id="rectHeight" value="80" min="1"></label>
+      <label>Depth: <input type="number" id="rectDepth" value="60" min="1"></label>
+      <label>Unit: <select id="rectUnit"><option>cm</option><option>mm</option><option>m</option></select></label>
+    </div>
+    <div class="displayOpts">
+      Show vertex labels <select id="show_rect_vertices"><option value="yes">Yes</option><option value="no">No</option></select>
+      Show space diagonals <select id="show_rect_spacediag"><option value="no">No</option><option value="yes">Yes</option></select>
+    </div>
+    <button onclick="drawShape()">Draw Rectangular Prism</button>
+  </div>
+  <!-- Triangular Prism -->
+  <div class="tabcontent">
+    <div class="controls">
+      <label>Side: <input type="number" id="triSide" value="90" min="1"></label>
+      <label>Height: <input type="number" id="triHeight" value="70" min="1"></label>
+      <label>Depth: <input type="number" id="triDepth" value="60" min="1"></label>
+      <label>Unit: <select id="triUnit"><option>cm</option><option>mm</option><option>m</option></select></label>
+    </div>
+    <div class="displayOpts">
+      Show vertex labels <select id="show_tri_vertices"><option value="yes">Yes</option><option value="no">No</option></select>
+    </div>
+    <button onclick="drawShape()">Draw Triangular Prism</button>
+  </div>
+  <!-- Square Pyramid -->
+  <div class="tabcontent">
+    <div class="controls">
+      <label>Base edge: <input type="number" id="sqpyBase" value="80" min="1"></label>
+      <label>Height: <input type="number" id="sqpyHeight" value="100" min="1"></label>
+      <label>Unit: <select id="sqpyUnit"><option>cm</option><option>mm</option><option>m</option></select></label>
+    </div>
+    <div class="displayOpts">
+      Show vertex labels <select id="show_sqpy_vertices"><option value="yes">Yes</option><option value="no">No</option></select>
+    </div>
+    <button onclick="drawShape()">Draw Square Pyramid</button>
+  </div>
+  <!-- Tetrahedron -->
+  <div class="tabcontent">
+    <div class="controls">
+      <label>Edge: <input type="number" id="tetraEdge" value="100" min="1"></label>
+      <label>Unit: <select id="tetraUnit"><option>cm</option><option>mm</option><option>m</option></select></label>
+    </div>
+    <div class="displayOpts">
+      Show vertex labels <select id="show_tetra_vertices"><option value="yes">Yes</option><option value="no">No</option></select>
+    </div>
+    <button onclick="drawShape()">Draw Tetrahedron</button>
+  </div>
+  <!-- Cone -->
+  <div class="tabcontent">
+    <div class="controls">
+      <label>Base radius: <input type="number" id="coneRadius" value="60" min="5"></label>
+      <label>Height: <input type="number" id="coneHeight" value="120" min="1"></label>
+      <label>Base segments: <input type="number" id="coneSegments" value="24" min="3" max="36"></label>
+      <label>Unit: <select id="coneUnit"><option>cm</option><option>mm</option><option>m</option></select></label>
+    </div>
+    <div class="displayOpts">
+      Show vertex labels <select id="show_cone_vertices"><option value="yes">Yes</option><option value="no">No</option></select>
+    </div>
+    <button onclick="drawShape()">Draw Cone</button>
+  </div>
+</div>
+<canvas id="canvasBox" width="480" height="400"></canvas>
+<script>
+// --- ROTATION STATE ---
+let rotY = Math.PI/8;
+let rotX = Math.PI/7;
+let dragging = false, lastX = 0, lastY = 0;
+
+const cW = 480, cH = 400;
+const ctx = document.getElementById('canvasBox').getContext('2d');
+
+// --- MOUSE HANDLING ---
+const canvas = document.getElementById('canvasBox');
+canvas.addEventListener('mousedown', function(e) {
+  dragging = true;
+  lastX = e.clientX;
+  lastY = e.clientY;
+  canvas.style.cursor = "grabbing";
+});
+window.addEventListener('mouseup', function() {
+  dragging = false;
+  canvas.style.cursor = "grab";
+});
+window.addEventListener('mousemove', function(e) {
+  if (dragging) {
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+    // Rotate horizontally (Y axis) and vertically (X axis)
+    rotY += dx * 0.012;
+    rotX += dy * 0.012;
+    rotX = Math.max(-Math.PI/2, Math.min(Math.PI/2, rotX)); // Prevent flipping over
+    lastX = e.clientX;
+    lastY = e.clientY;
+    drawShape();
+  }
+});
+
+// --- CHARMING BACKGROUND ---
+function clearCanvasWithCharm() {
+  let g = ctx.createLinearGradient(0,0,0,cH);
+  g.addColorStop(0,"#eafff2");
+  g.addColorStop(0.67,"#fff8f2");
+  g.addColorStop(1,"#bce3ff");
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,cW,cH); 
+}
+
+// --- 3D TRANSFORMS ---
+function rotate3D([x, y, z], tY, tX) {
+  let x1 = x*Math.cos(tY) + z*Math.sin(tY);
+  let z1 = -x*Math.sin(tY) + z*Math.cos(tY);
+  let y1 = y*Math.cos(tX) - z1*Math.sin(tX);
+  let z2 = y*Math.sin(tX) + z1*Math.cos(tX);
+  return [x1, y1, z2];
+}
+function getViewDir() {
+  return rotate3D([0,0,-1], rotY, rotX);
+}
+function projectAndCenter(verts) {
+  let proj = verts.map(v => rotate3D(v, rotY, rotX));
+  let minX=1e9, maxX=-1e9, minY=1e9, maxY=-1e9;
+  proj.forEach(([x,y,z]) => {
+    let px = x*1.2 + z*0.7;
+    let py = y*1.1 - z*0.9;
+    minX = Math.min(minX, px);
+    maxX = Math.max(maxX, px);
+    minY = Math.min(minY, py);
+    maxY = Math.max(maxY, py);
+  });
+  let sx = cW/(maxX-minX)*0.7, sy = cH/(maxY-minY)*0.7, s = Math.min(sx, sy);
+  const ox = cW/2 - s*(minX+maxX)/2;
+  const oy = cH/2 - s*(minY+maxY)/2;
+  return proj.map(([x,y,z],i) => ({
+    x: s*(x*1.2+z*0.7)+ox,
+    y: s*(y*1.1-z*0.9)+oy,
+    z: z,
+    idx: i
+  }));
+}
+function getFaceNormal(face, verts) {
+  let v0 = verts[face[0]], v1 = verts[face[1]], v2 = verts[face[2]];
+  let a = [v1.x-v0.x, v1.y-v0.y, v1.z-v0.z];
+  let b = [v2.x-v0.x, v2.y-v0.y, v2.z-v0.z];
+  let n = [ a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0] ];
+  let len = Math.sqrt(n[0]*n[0]+n[1]*n[1]+n[2]*n[2]);
+  return len? [n[0]/len, n[1]/len, n[2]/len]: [0,0,0];
+}
+function isEdgeFront(edge, faces, verts) {
+  let viewDir = getViewDir();
+  let adjacent = faces.filter(f => f.includes(edge[0]) && f.includes(edge[1]));
+  for (let face of adjacent) {
+    let n = getFaceNormal(face, verts);
+    let dot = n[0]*viewDir[0]+n[1]*viewDir[1]+n[2]*viewDir[2];
+    if (dot > 0.01) return true;
+  }
+  return false;
+}
+function drawEdge(p1, p2, isFront, color="#3888b6") {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = isFront ? 2.5 : 1.2;
+  ctx.beginPath();
+  ctx.moveTo(p1.x,p1.y);
+  ctx.lineTo(p2.x,p2.y);
+  ctx.setLineDash(isFront ? [] : [7, 6]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.lineWidth = 1;
+}
+function drawLabel(p, text, color="#f06b90") {
+  ctx.fillStyle = color;
+  ctx.font = "bold 18px Comic Sans MS, Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(text, p.x, p.y-5);
+}
+function fillFace(face, verts, fillStyle) {
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = fillStyle;
+  ctx.beginPath();
+  ctx.moveTo(verts[face[0]].x, verts[face[0]].y);
+  for(let i=1; i<face.length; i++) ctx.lineTo(verts[face[i]].x, verts[face[i]].y);
+  ctx.closePath();
+  ctx.fill();
+}
+function getToggle(id, def=true) {
+  const el = document.getElementById(id);
+  if (!el) return def;
+  return el.value === "yes";
+}
+
+function showTab(n) {
+  let tabs = document.querySelectorAll('.tabcontent');
+  let btns = document.querySelectorAll('.tabbtn');
+  tabs.forEach((tab,i) => {
+    tab.className = 'tabcontent' + (i === n ? ' active' : '');
+    btns[i].className = 'tabbtn' + (i === n ? ' active' : '');
+  });
+  drawShape();
+}
+
+// --- SHAPE DEFINITION (same as before)
+function createCube(e) {
+  const w = e/2;
+  return [
+    [-w,-w,-w], [ w,-w,-w], [ w, w,-w], [-w, w,-w],
+    [-w,-w, w], [ w,-w, w], [ w, w, w], [-w, w, w]
+  ];
+}
+const cubeFaces = [
+  [0,1,2,3],[4,5,6,7],[0,1,5,4],[2,3,7,6],[1,2,6,5],[0,3,7,4]
+];
+const cubeEdges = [
+    [0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]
+];
+const cubeSpaceDiagonals = [
+    [0,6],[1,7],[2,4],[3,5]
+];
+
+function createRectPrism(w,h,d) {
+  w/=2; h/=2; d/=2;
+  return [
+    [-w,-h,-d],[ w,-h,-d],[ w, h,-d],[-w, h,-d],
+    [-w,-h, d],[ w,-h, d],[ w, h, d],[-w, h, d]
+  ];
+}
+const rectPrismFaces = cubeFaces;
+const rectPrismEdges = cubeEdges.slice();
+const rectPrismSpaceDiagonals = cubeSpaceDiagonals.slice();
+
+function createTriPrism(a, h, d){
+  let base = [
+    [0,-h/2,-d/2],
+    [a/2,h/2,-d/2],
+    [-a/2,h/2,-d/2]
+  ];
+  let top = base.map(v => [v[0], v[1], d/2]);
+  return base.concat(top);
+}
+const triPrismFaces = [
+  [0,1,2],[3,4,5],
+  [0,1,4,3],[1,2,5,4],[2,0,3,5]
+];
+const triPrismEdges = [
+  [0,1],[1,2],[2,0],[3,4],[4,5],[5,3],[0,3],[1,4],[2,5]
+];
+
+function createSqPyramid(a, h){
+  let half = a/2;
+  let base = [[-half,-half,-h/2],[half,-half,-h/2],[half,half,-h/2],[-half,half,-h/2]];
+  let apex = [0,0,h/2];
+  return base.concat([apex]);
+}
+const sqPyFaces = [
+  [0,1,2,3], [0,1,4],[1,2,4],[2,3,4],[3,0,4]
+];
+const sqPyEdges = [
+  [0,1],[1,2],[2,3],[3,0],[0,4],[1,4],[2,4],[3,4]
+];
+
+function createTetrahedron(a){
+  let h = Math.sqrt(2/3)*a;
+  let r = a/Math.sqrt(3);
+  return [
+    [0,0,h*1.5],[a/2, r, 0],[-a/2, r, 0],[0,-r*2,0]
+  ];
+}
+const tetraFaces = [
+  [0,1,2],[0,2,3],[0,3,1],[1,2,3]
+];
+const tetraEdges = [
+  [0,1],[0,2],[0,3],[1,2],[2,3],[1,3]
+];
+
+function createCone(r, h, n=24) {
+  let verts = [];
+  let angleStep = 2*Math.PI/n;
+  for(let k=0;k<n;k++) {
+    let ang = k*angleStep;
+    verts.push([r*Math.cos(ang), r*Math.sin(ang), -h/2]);
+  }
+  verts.push([0,0,h/2]);
+  return verts;
+}
+function coneEdges(n) {
+  let edges=[];
+  for(let i=0;i<n;i++) {
+    edges.push([i,(i+1)%n]);
+    edges.push([i,n]);
+  }
+  return edges;
+}
+function coneFaces(n) {
+  let faces=[];
+  for(let i=0;i<n;i++) {
+    faces.push([i,(i+1)%n,n]); // side triangles
+  }
+  faces.push([...Array(n).keys()]); // base
+  return faces;
+}
+
+// Get "bottom" (lowest z) face of a polyhedron defined by verts and faces
+function getBottomFaceIndex(verts, faces) {
+  let minAvgZ = Infinity, minIdx = -1;
+  faces.forEach((face,i) => {
+    let avgZ = face.reduce((sum,idx)=>sum+verts[idx][2],0)/face.length;
+    if(avgZ < minAvgZ) { minAvgZ = avgZ; minIdx = i; }
+  });
+  return minIdx;
+}
+
+// --- DRAW with base face & charming colors
+function drawShape() {
+  clearCanvasWithCharm();
+
+  let mode = Array.from(document.querySelectorAll('.tabbtn')).findIndex(btn => btn.classList.contains('active'));
+  let verts, faces, edges, spaceDiagonals=[], unit, showVertices, title="", showSpaceDiag=false, rawVerts;
+  switch(mode){
+    case 0:
+      unit = document.getElementById('cubeUnit').value;
+      const cubeEdge = Number(document.getElementById('cubeEdge').value);
+      if (!cubeEdge) { showFeedback("Edge length required."); return;}
+      rawVerts = createCube(cubeEdge);
+      verts = projectAndCenter(rawVerts);
+      faces = cubeFaces;
+      edges = cubeEdges;
+      spaceDiagonals = getToggle('show_cube_spacediag') ? cubeSpaceDiagonals : [];
+      showVertices = getToggle('show_cube_vertices');
+      title = "Cube (edge: "+cubeEdge+unit+")";
+      break;
+    case 1:
+      unit = document.getElementById('rectUnit').value;
+      const rw = Number(document.getElementById('rectWidth').value),
+        rh = Number(document.getElementById('rectHeight').value),
+        rd = Number(document.getElementById('rectDepth').value);
+      if(!rw||!rh||!rd){showFeedback("Widths, height, depth required.");return;}
+      rawVerts = createRectPrism(rw,rh,rd);
+      verts = projectAndCenter(rawVerts);
+      faces = rectPrismFaces;
+      edges = rectPrismEdges;
+      spaceDiagonals = getToggle('show_rect_spacediag') ? rectPrismSpaceDiagonals : [];
+      showVertices = getToggle('show_rect_vertices');
+      title = "Rectangular Prism ("+rw+"x"+rh+"x"+rd+unit+")";
+      break;
+    case 2:
+      unit = document.getElementById('triUnit').value;
+      const ts = Number(document.getElementById('triSide').value),
+        th = Number(document.getElementById('triHeight').value),
+        td = Number(document.getElementById('triDepth').value);
+      if(!ts||!th||!td){showFeedback("Side, height, depth required.");return;}
+      rawVerts = createTriPrism(ts,th,td);
+      verts = projectAndCenter(rawVerts);
+      faces = triPrismFaces;
+      edges = triPrismEdges;
+      spaceDiagonals = [];
+      showVertices = getToggle('show_tri_vertices');
+      title = "Triangular Prism (side: "+ts+",h:"+th+",d:"+td+unit+")";
+      break;
+    case 3:
+      unit = document.getElementById('sqpyUnit').value;
+      const sqa = Number(document.getElementById('sqpyBase').value),
+        sqh = Number(document.getElementById('sqpyHeight').value);
+      if(!sqa||!sqh){showFeedback("Base and height required.");return;}
+      rawVerts = createSqPyramid(sqa,sqh);
+      verts = projectAndCenter(rawVerts);
+      faces = sqPyFaces;
+      edges = sqPyEdges;
+      spaceDiagonals = [];
+      showVertices = getToggle('show_sqpy_vertices');
+      title = "Square Pyramid ("+sqa+" base, "+sqh+" h "+unit+")";
+      break;
+    case 4:
+      unit = document.getElementById('tetraUnit').value;
+      const ta = Number(document.getElementById('tetraEdge').value);
+      if(!ta){showFeedback("Edge required.");return;}
+      rawVerts = createTetrahedron(ta);
+      verts = projectAndCenter(rawVerts);
+      faces = tetraFaces;
+      edges = tetraEdges;
+      spaceDiagonals = [];
+      showVertices = getToggle('show_tetra_vertices');
+      title = "Tetrahedron (edge: "+ta+unit+")";
+      break;
+    case 5:
+      unit = document.getElementById('coneUnit').value;
+      const cr = Number(document.getElementById('coneRadius').value),
+        ch = Number(document.getElementById('coneHeight').value),
+        cn = Number(document.getElementById('coneSegments').value);
+      if(!cr||!ch||!cn){showFeedback("Radius, height and segments required.");return;}
+      rawVerts = createCone(cr, ch, cn);
+      verts = projectAndCenter(rawVerts);
+      faces = coneFaces(cn);
+      edges = coneEdges(cn);
+      spaceDiagonals = [];
+      showVertices = getToggle('show_cone_vertices');
+      title = "Cone (radius: "+cr+" height:"+ch+" Segments:"+cn+" "+unit+")";
+      break;
+    default: return;
+  }
+
+  let baseColor = "rgba(255,140,40,0.53)";
+  let sideColor = "rgba(138,226,255,0.19)";
+  let base = getBottomFaceIndex(rawVerts, faces);
+
+  // Draw colored base face & soft colour on other visible faces
+  faces.forEach((face, i)=>{
+    let normal = getFaceNormal(face, verts);
+    let dot = normal[0]*getViewDir()[0]+normal[1]*getViewDir()[1]+normal[2]*getViewDir()[2];
+    if(dot>0.07){
+      if(i===base){
+        fillFace(face, verts, baseColor);
+      } else if(face.length>2){
+        fillFace(face, verts, sideColor);
+      }
+    }
+  });
+
+  edges.forEach(edge=>{
+    let isFront = isEdgeFront(edge, faces, verts);
+    drawEdge(verts[edge[0]], verts[edge[1]], isFront, isFront ? "#426fd8" : "#bbb");
+  });
+  spaceDiagonals.forEach(edge => {
+    let isFront = isEdgeFront(edge, faces, verts);
+    drawEdge(verts[edge[0]], verts[edge[1]], isFront, "#ff6b86");
+  });
+
+  if(mode===5 && showVertices){
+    verts.forEach((v,i)=> {
+      if(i<verts.length-1)
+        drawLabel(v, String.fromCharCode(65+i),"#f06b90");
+      else
+        drawLabel(v, "Apex", "#eaaf40");
+    });
+  } else if(showVertices){
+    verts.forEach((v,i)=>drawLabel(v,String.fromCharCode(65+i),"#f06b90"));
+  }
+  ctx.fillStyle="#3888b6";ctx.font="bold 20px Trebuchet MS";
+  ctx.fillText(title,cW/2,31);
+}
+function showFeedback(msg) {
+  document.getElementById('feedback').innerText = msg;
+}
+function setupEnterKey() {
+  const tabContents = document.querySelectorAll('.tabcontent');
+  tabContents.forEach(tabContent => {
+    tabContent.querySelectorAll('input').forEach(input => {
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          let drawBtn = tabContent.querySelector('button');
+          if (drawBtn) drawBtn.click();
+        }
+      });
+    });
+  });
+}
+window.onload = function() {
+  setupEnterKey();
+  drawShape();
+};
+
+</script>
+</body>
+</html>
